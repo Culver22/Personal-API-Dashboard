@@ -4,6 +4,7 @@ from sqlalchemy.future import select
 from app.models.goal import CreateGoal, ReadGoal
 from app.db.models.goal import Goal
 from app.db.database import get_db
+from typing import List
 
 router = APIRouter()
 
@@ -24,3 +25,11 @@ async def create_goal(goal: CreateGoal, db: AsyncSession = Depends(get_db)):
     await db.refresh(new_goal)  # Refresh in order to get generated fields (e.g. ID)
 
     return new_goal
+
+
+@router.get("/goals", response_model=List[ReadGoal])  # Returns a list of goals in the format defined by ReadGoal (ID)
+async def get_goals(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Goal))  # Select * From goals
+    goals = result.scalars().all()  # Just the Goal objects - ignores row metadata
+
+    return goals
