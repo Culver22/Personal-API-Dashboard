@@ -5,6 +5,7 @@ from app.models.goal import CreateGoal, ReadGoal
 from app.db.models.goal import Goal
 from app.db.database import get_db
 from typing import List
+from fastapi import HTTPException
 
 router = APIRouter()
 
@@ -33,3 +34,15 @@ async def get_goals(db: AsyncSession = Depends(get_db)):
     goals = result.scalars().all()  # Just the Goal objects - ignores row metadata
 
     return goals
+
+
+@router.delete("/goals/{goal_id}", status_code=204)  # successfully deleted
+async def delete_goal(goal_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Goal).where(Goal.id == goal_id))  # Search for specific goal by ID
+    goal = result.scalars().first()
+
+    if not goal:
+        raise HTTPException(status_code=404, detail="Goal not found")
+
+    await db.delete(goal)
+    await db.commit()
