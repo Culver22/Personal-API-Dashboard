@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 # Route to create a new workout and store it in the database
-@router.post("/workouts", response_model=ReadWorkout)
+@router.post("/", response_model=ReadWorkout)
 async def create_workout(workout: CreateWorkout, db: AsyncSession = Depends(get_db)):
     # Create a new SQLAlchemy Workout instance from Pydantic input
     new_workout = Workout(
@@ -29,14 +29,14 @@ async def create_workout(workout: CreateWorkout, db: AsyncSession = Depends(get_
     return new_workout
 
 
-@router.get("/workouts", response_model=List[ReadWorkout])  # Returns a list of workouts from the database
+@router.get("/", response_model=List[ReadWorkout])  # Returns a list of workouts from the database
 async def get_workouts(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Workout))  # SELECT * FROM workouts
     workouts = result.scalars().all()
     return workouts
 
 
-@router.delete("/workouts/{workout_id}", status_code=204)
+@router.delete("/{workout_id}", status_code=204)
 async def delete_workout(workout_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Workout).where(Workout.id == workout_id))
     workout = result.scalars().first()

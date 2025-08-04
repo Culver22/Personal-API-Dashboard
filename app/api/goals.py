@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 # Route to create a new goal and store it in the database
-@router.post("/goals", response_model=ReadGoal)
+@router.post("/", response_model=ReadGoal)
 async def create_goal(goal: CreateGoal, db: AsyncSession = Depends(get_db)):
     # Create a new SQLAlchemy goal instance from Pydantic input
     new_goal = Goal(
@@ -28,7 +28,7 @@ async def create_goal(goal: CreateGoal, db: AsyncSession = Depends(get_db)):
     return new_goal
 
 
-@router.get("/goals", response_model=List[ReadGoal])  # Returns a list of goals in the format defined by ReadGoal (ID)
+@router.get("/", response_model=List[ReadGoal])  # Returns a list of goals in the format defined by ReadGoal (ID)
 async def get_goals(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Goal))  # Select * From goals
     goals = result.scalars().all()  # Just the Goal objects - ignores row metadata
@@ -36,7 +36,7 @@ async def get_goals(db: AsyncSession = Depends(get_db)):
     return goals
 
 
-@router.delete("/goals/{goal_id}", status_code=204)  # successfully deleted
+@router.delete("/{goal_id}", status_code=204)  # successfully deleted
 async def delete_goal(goal_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Goal).where(Goal.id == goal_id))  # Search for specific goal by ID
     goal = result.scalars().first()

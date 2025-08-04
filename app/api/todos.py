@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 # Route to create a new todo and store it in the database
-@router.post("/todos", response_model=ReadTodo)
+@router.post("/", response_model=ReadTodo)
 async def create_todo(todo: CreateTodo, db: AsyncSession = Depends(get_db)):
     # Create a new SQLAlchemy todo instance from Pydantic input
     new_todo = ToDo(
@@ -28,14 +28,14 @@ async def create_todo(todo: CreateTodo, db: AsyncSession = Depends(get_db)):
     return new_todo
 
 
-@router.get("/todos", response_model=List[ReadTodo])  # Returns a list of todos in the format defined by ReadTodo
+@router.get("/", response_model=List[ReadTodo])  # Returns a list of todos in the format defined by ReadTodo
 async def get_todos(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(ToDo))  # SELECT * FROM todos
     todos = result.scalars().all()
     return todos
 
 
-@router.delete("/todos/{todo_id}", status_code=204)
+@router.delete("/{todo_id}", status_code=204)
 async def delete_todo(todo_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(ToDo).where(ToDo.id == todo_id))
     todo = result.scalars().first()
