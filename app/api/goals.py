@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.models.goal import CreateGoal, ReadGoal
+from app.models.goal import CreateGoal, ReadGoal, UpdateGoal
 from app.db.models.goal import Goal
 from app.db.database import get_db
 from typing import List
@@ -46,3 +46,28 @@ async def delete_goal(goal_id: int, db: AsyncSession = Depends(get_db)):
 
     await db.delete(goal)
     await db.commit()
+
+
+@router.patch("/{goal_id}", response_model=ReadGoal)
+async def update_goal(goal_id: int, goal_data: UpdateGoal, db: AsyncSession = Depends(get_db)):
+    # Load the existing row
+    result = await db.execute(select(Goal).where(Goal.id == goal_id))
+    goal = result.scalars().first()
+    if not goal:
+        raise HTTPException(status_code=404, detail="Goal not found")
+
+    # Extract only provided fields
+    updates = goal_data.dict(exclude_unset=True)  # Exclude any values which are None (Unchanged values)
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields provided to update")
+
+    # Apply changes to the existing instance (no new row created)
+    for key, value in updates.items():
+        # protect against accidental id updates
+        if key == "id":
+            continue
+        setattr(goal, key, value)
+
+    await db.commit()
+    await db.refresh(goal)
+    return goal

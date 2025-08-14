@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List
 
-from app.models.workout import CreateWorkout, ReadWorkout
+from app.models.workout import CreateWorkout, ReadWorkout, UpdateWorkout
 from app.db.models.workout import Workout
 from app.db.database import get_db
 
@@ -36,9 +36,9 @@ async def get_workouts(db: AsyncSession = Depends(get_db)):
     return workouts
 
 
-@router.delete("/{workout_id}", status_code=204)
+@router.delete("/{workout_id}", status_code=204)  # successfully deleted
 async def delete_workout(workout_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Workout).where(Workout.id == workout_id))
+    result = await db.execute(select(Workout).where(Workout.id == workout_id))  # Search for specific workout by ID
     workout = result.scalars().first()
 
     if not workout:
@@ -46,3 +46,28 @@ async def delete_workout(workout_id: int, db: AsyncSession = Depends(get_db)):
 
     await db.delete(workout)
     await db.commit()
+
+
+@router.patch("/{workout_id}", response_model=ReadWorkout)
+async def update_workout(workout_id: int, workout_data: UpdateWorkout, db: AsyncSession = Depends(get_db)):
+    # Load the existing row
+    result = await db.execute(select(Workout).where(Workout.id == workout_id))
+    workout = result.scalars().first()
+    if not workout:
+        raise HTTPException(status_code=404, detail="Workout not found")
+
+    # Extract only provided fields
+    updates = workout_data.dict(exclude_unset=True)  # Exclude any values which are None (Unchanged values)
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields provided to update")
+
+    # Apply changes to the existing instance (no new row created)
+    for key, value in updates.items():
+        # protect against accidental id updates
+        if key == "id":
+            continue
+        setattr(workout, key, value)
+
+    await db.commit()
+    await db.refresh(workout)
+    return workout
