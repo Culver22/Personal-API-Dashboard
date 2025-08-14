@@ -11,3 +11,10 @@ class CreateGoal(BaseModel):
 
 class ReadGoal(CreateGoal):
     id: int
+
+
+class UpdateGoal(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    deadline: Optional[str] = None
+    completed: Optional[bool] = None

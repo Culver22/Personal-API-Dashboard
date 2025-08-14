@@ -18,3 +18,10 @@ class CreateTodo(BaseModel):
 
 class ReadTodo(CreateTodo):
     id: int
+
+
+class UpdateTodo(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    completed: Optional[bool] = None
+    priority: Optional[Priority] = None

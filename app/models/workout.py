@@ -20,3 +20,11 @@ class CreateWorkout(BaseModel):
 
 class ReadWorkout(CreateWorkout):
     id: int
+
+
+class UpdateWorkout(BaseModel):
+    type: Optional[WorkoutType] = None
+    duration_minutes: Optional[int] = None
+    sets: Optional[int] = None
+    notes: Optional[str] = None
+    completed: Optional[bool] = None
