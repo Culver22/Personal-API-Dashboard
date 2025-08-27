@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictInt
 from typing import Optional
 from enum import Enum
 
@@ -12,7 +12,7 @@ class WorkoutType(str, Enum):
 
 class CreateWorkout(BaseModel):
     type: WorkoutType
-    duration_minutes: Optional[int] = None  # Duration in minutes
+    duration_minutes: StrictInt  # Duration in minutes
     sets: Optional[int] = None  # For gym-style workouts
     notes: Optional[str] = None
     completed: Optional[bool] = False

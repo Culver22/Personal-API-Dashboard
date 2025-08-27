@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictBool
 from typing import Optional
 
 
@@ -6,7 +6,7 @@ class CreateGoal(BaseModel):
     title: str
     description: Optional[str] = None
     deadline: Optional[str] = None
-    completed: Optional[bool] = False
+    completed: Optional[StrictBool] = False
 
 
 class ReadGoal(CreateGoal):

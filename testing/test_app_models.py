@@ -51,8 +51,8 @@ def test_read_goal_valid():
 
 # Test 7: Valid CreateTodo with priority
 def test_create_todo_valid():
-    todo = CreateTodo(title="Buy milk", description="Almond milk", priority=Priority.HIGH, completed=False)
-    assert todo.priority == Priority.HIGH
+    todo = CreateTodo(title="Buy milk", description="Almond milk", priority=Priority.high, completed=False)
+    assert todo.priority == Priority.high
 
 
 # Test 8: Invalid priority (not a valid enum)
@@ -63,9 +63,9 @@ def test_create_todo_invalid_priority():
 
 # Test 9: ReadTodo inherits CreateTodo and includes ID
 def test_read_todo_valid():
-    todo = ReadTodo(id=3, title="Laundry", completed=True, priority=Priority.LOW)
+    todo = ReadTodo(id=3, title="Laundry", completed=True, priority=Priority.low)
     assert todo.id == 3
-    assert todo.priority == Priority.LOW
+    assert todo.priority == Priority.low
 
 # Test 10: Missing required title
 def test_create_todo_missing_title():
@@ -82,7 +82,7 @@ def test_create_todo_empty_title():
 # Test 12: Priority is optional
 def test_create_todo_priority_optional():
     todo = CreateTodo(title="Walk dog")
-    assert todo.priority is None
+    assert todo.priority is Priority.medium
 
 
 # Test 13: Completed defaults to False
@@ -100,16 +100,16 @@ def test_create_todo_invalid_completed_type():
 
 # Test 15: Valid CreateWorkout instance
 def test_create_workout_valid():
-    workout = CreateWorkout(type=WorkoutType.running, duration=30)
+    workout = CreateWorkout(type=WorkoutType.running, duration_minutes=30)
     assert workout.type == WorkoutType.running
-    assert workout.duration == 30
+    assert workout.duration_minutes == 30
     assert workout.sets is None
     assert workout.completed is False
 
 # Test 16: Missing required field: type
 def test_create_workout_missing_type():
     with pytest.raises(ValidationError):
-        CreateWorkout(duration=45)
+        CreateWorkout(duration_minutes=45)
 
 # Test 17: Missing required field: duration
 def test_create_workout_missing_duration():
@@ -124,13 +124,13 @@ def test_create_workout_invalid_type():
 # Test 19: Invalid type for duration
 def test_create_workout_invalid_duration_type():
     with pytest.raises(ValidationError):
-        CreateWorkout(type=WorkoutType.yoga, duration="forty")  # Should be int
+        CreateWorkout(type=WorkoutType.yoga, duration_minutes="forty")  # Should be int
 
 # Test 20: Valid workout with all optional fields
 def test_create_workout_with_all_fields():
     workout = CreateWorkout(
         type=WorkoutType.gym,
-        duration=60,
+        duration_minutes=60,
         sets=5,
         notes="Leg day",
         completed=True
@@ -144,8 +144,8 @@ def test_read_workout_with_id():
     workout = ReadWorkout(
         id=1,
         type=WorkoutType.running,
-        duration=20
+        duration_minutes=20
     )
     assert workout.id == 1
     assert workout.type == WorkoutType.running
-    assert workout.duration == 20
+    assert workout.duration_minutes == 20
