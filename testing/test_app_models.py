@@ -96,3 +96,56 @@ def test_create_todo_invalid_completed_type():
     with pytest.raises(ValidationError):
         CreateTodo(title="Clean", completed="done")  # should be bool
 
+''' WORKOUT MODEL TESTS '''
+
+# Test 15: Valid CreateWorkout instance
+def test_create_workout_valid():
+    workout = CreateWorkout(type=WorkoutType.running, duration=30)
+    assert workout.type == WorkoutType.running
+    assert workout.duration == 30
+    assert workout.sets is None
+    assert workout.completed is False
+
+# Test 16: Missing required field: type
+def test_create_workout_missing_type():
+    with pytest.raises(ValidationError):
+        CreateWorkout(duration=45)
+
+# Test 17: Missing required field: duration
+def test_create_workout_missing_duration():
+    with pytest.raises(ValidationError):
+        CreateWorkout(type=WorkoutType.gym)
+
+# Test 18: Invalid workout type
+def test_create_workout_invalid_type():
+    with pytest.raises(ValidationError):
+        CreateWorkout(type="swimming", duration=20)  # Not in enum
+
+# Test 19: Invalid type for duration
+def test_create_workout_invalid_duration_type():
+    with pytest.raises(ValidationError):
+        CreateWorkout(type=WorkoutType.yoga, duration="forty")  # Should be int
+
+# Test 20: Valid workout with all optional fields
+def test_create_workout_with_all_fields():
+    workout = CreateWorkout(
+        type=WorkoutType.gym,
+        duration=60,
+        sets=5,
+        notes="Leg day",
+        completed=True
+    )
+    assert workout.sets == 5
+    assert workout.notes == "Leg day"
+    assert workout.completed is True
+
+# Test 21: ReadWorkout includes ID
+def test_read_workout_with_id():
+    workout = ReadWorkout(
+        id=1,
+        type=WorkoutType.running,
+        duration=20
+    )
+    assert workout.id == 1
+    assert workout.type == WorkoutType.running
+    assert workout.duration == 20
